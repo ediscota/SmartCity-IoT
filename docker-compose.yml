@@ -1,0 +1,76 @@
+services:
+  # 1. MQTT Broker (Mosquitto)
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mqtt_broker
+    ports:
+      - "1883:1883" # MQTT port
+      - "9001:9001" # Websocket port
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - iot_network
+
+  # 2. Middleware (Node-RED)
+  node-red:
+    image: nodered/node-red
+    container_name: node_red
+    ports:
+      - "1880:1880"
+    volumes:
+      - node_red_data:/data
+    networks:
+      - iot_network
+    depends_on:
+      - mosquitto
+
+  # 3. Time-Series Database (InfluxDB)
+  # Using v1.8 here for easier integration with Grafana/Node-RED for students
+  influxdb:
+    image: influxdb:1.8
+    container_name: smartcity_influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=smart_city_db
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin_password
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    networks:
+      - iot_network
+
+  # 4. Visualization (Grafana)
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - iot_network
+    depends_on:
+      - influxdb
+
+  # 5. Your Python Data Generator
+  sensor-simulator:
+    build: ./sensors # Builds using the Dockerfile in the current directory
+    container_name: sensor_simulator
+    environment:
+      - MQTT_BROKER=mosquitto  # Tells the script to connect to the service named 'mosquitto'
+    networks:
+      - iot_network
+    depends_on:
+      - mosquitto
+
+# Create a shared network for all containers to talk to each other
+networks:
+  iot_network:
+    driver: bridge
+
+# Persist data so you don't lose flows/dashboards when restarting
+volumes:
+  node_red_data:
+  influxdb_data:
+  grafana_data:

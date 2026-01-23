@@ -43,7 +43,7 @@ services:
   # 4. Visualization (Grafana)
   grafana:
     image: grafana/grafana
-    container_name: grafana
+    container_name: smartcity_grafana
     ports:
       - "3000:3000"
     volumes:

@@ -76,6 +76,22 @@ def publish_street_data(mqtt_client, sensor_list, district, street):
             elif sensor == 'traffic':
                 data = random.randint(0, 80)
                 unit = "km/h"
+            elif sensor == 'pm25':
+                data = round(random.uniform(5, 80), 2)
+                unit = "ug/m3"
+            elif sensor == 'pm10':
+                data = round(random.uniform(10, 150), 2)
+                unit = "ug/m3"
+            elif sensor == 'co':
+                data = round(random.uniform(0.1, 5.0), 2)
+                unit = "ppm"
+            elif sensor == 'no2':
+                data = round(random.uniform(5, 200), 2)
+                unit = "ppb"
+            elif sensor == 'o3':
+                data = round(random.uniform(10, 180), 2)
+                unit = "ppb"
+
             
             # Topic Structure: smartcity/district_0/street_1/temperature
             topic = f"smartcity/district_{district}/street_{street}/{sensor}"

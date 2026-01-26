@@ -13,19 +13,18 @@ services:
 
   # 2. Middleware (Node-RED)
   node-red:
-  image: nodered/node-red
-  container_name: node_red
-  ports:
-    - "1880:1880"
-  volumes:
-    - ./nodered:/data
-  environment:
-    - FLOWS=flows.json
-  networks:
-    - iot_network
-  depends_on:
-    - mosquitto
-
+    image: nodered/node-red
+    container_name: node_red
+    ports:
+      - "1880:1880"
+    volumes:
+      - node_red_data:/data
+    environment:
+      - FLOWS=flows.json
+    networks:
+      - iot_network
+    depends_on:
+      - mosquitto
 
   # 3. Time-Series Database (InfluxDB)
   # Using v1.8 here for easier integration with Grafana/Node-RED for students

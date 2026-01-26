@@ -13,7 +13,7 @@ services:
 
   # 2. Middleware (Node-RED)
   node-red:
-    image: nodered/node-red
+    build: .
     container_name: node_red
     ports:
       - "1880:1880"
@@ -25,6 +25,7 @@ services:
       - iot_network
     depends_on:
       - mosquitto
+
 
 
   # 3. Time-Series Database (InfluxDB)

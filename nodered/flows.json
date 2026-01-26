@@ -69,15 +69,6 @@
         "sessionExpiry": ""
     },
     {
-        "id": "83de82558e8c9066",
-        "type": "global-config",
-        "env": [],
-        "modules": {
-            "node-red-contrib-telegrambot": "17.0.5",
-            "node-red-contrib-influxdb": "0.7.0"
-        }
-    },
-    {
         "id": "7053e9055bd0b798",
         "type": "telegram bot",
         "botname": "AlertBot",
@@ -285,6 +276,24 @@
         ]
     },
     {
+        "id": "667446e1bc6cd85d",
+        "type": "influxdb out",
+        "z": "f6f2187d.f17ca8",
+        "influxdb": "44ec679abea81acc",
+        "name": "",
+        "measurement": "",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "smartcity-org",
+        "bucket": "smartcity-bucket",
+        "x": 1500,
+        "y": 300,
+        "wires": []
+    },
+    {
         "id": "4b32dc2d835769b2",
         "type": "function",
         "z": "f6f2187d.f17ca8",
@@ -384,21 +393,12 @@
         ]
     },
     {
-        "id": "667446e1bc6cd85d",
-        "type": "influxdb out",
-        "z": "f6f2187d.f17ca8",
-        "influxdb": "44ec679abea81acc",
-        "name": "",
-        "measurement": "",
-        "precision": "",
-        "retentionPolicy": "",
-        "database": "database",
-        "precisionV18FluxV20": "ms",
-        "retentionPolicyV18Flux": "",
-        "org": "smartcity-org",
-        "bucket": "smartcity-bucket",
-        "x": 1500,
-        "y": 300,
-        "wires": []
+        "id": "83de82558e8c9066",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-telegrambot": "17.0.5",
+            "node-red-contrib-influxdb": "0.7.0"
+        }
     }
 ]

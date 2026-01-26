@@ -13,18 +13,18 @@ services:
 
   # 2. Middleware (Node-RED)
   node-red:
-  image: nodered/node-red
-  container_name: node_red
-  ports:
-    - "1880:1880"
-  volumes:
-    - ./nodered:/data
-  environment:
-    - FLOWS=flows.json
-  networks:
-    - iot_network
-  depends_on:
-    - mosquitto
+    image: nodered/node-red
+    container_name: node_red
+    ports:
+      - "1880:1880"
+    volumes:
+      - ./nodered:/data
+    environment:
+      - FLOWS=flows.json
+    networks:
+      - iot_network
+    depends_on:
+      - mosquitto
 
 
   # 3. Time-Series Database (InfluxDB)

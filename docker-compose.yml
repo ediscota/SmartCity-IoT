@@ -19,6 +19,8 @@ services:
       - "1880:1880"
     volumes:
       - node_red_data:/data
+    environment:
+      - FLOWS=flows.json
     networks:
       - iot_network
     depends_on:

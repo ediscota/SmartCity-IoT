@@ -1,0 +1,9 @@
+{
+  "name": "node-red-project",
+  "description": "Smart City Project",
+  "version": "0.0.1",
+  "dependencies": {
+    "node-red-contrib-influxdb": "0.7.0",
+    "node-red-contrib-telegrambot": "15.1.2"
+  }
+}

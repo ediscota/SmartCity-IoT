@@ -17,8 +17,14 @@ services:
     container_name: node_red
     ports:
       - "1880:1880"
+    environment:
+      - FLOWS=flows.json
+      # --- AGGIUNTA VARIABILI ---
+      - INFLUX_TOKEN=my-super-secret-auth-token  # Deve coincidere con quello di InfluxDB sotto
+      - TELEGRAM_BOT_TOKEN=8458510312:AAFgcKYmvDqk6gj8xI55lpcynFmudzdvYTA
+      - TELEGRAM_CHAT_ID=-5200673556
     volumes:
-      - node_red_data:/data
+      - ./node_red_data:/data
     networks:
       - iot_network
     depends_on:

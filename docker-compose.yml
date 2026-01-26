@@ -13,16 +13,16 @@ services:
 
   # 2. Middleware (Node-RED)
   node-red:
-    image: nodered/node-red
+    build:
+      context: ./nodered
+      dockerfile: Dockerfile
     container_name: node_red
     ports:
       - "1880:1880"
     volumes:
-      - node_red_data:/data
+      - ./nodered/data:/data
     networks:
       - iot_network
-    depends_on:
-      - mosquitto
 
   # 3. Time-Series Database (InfluxDB)
   # Using v1.8 here for easier integration with Grafana/Node-RED for students
@@ -72,8 +72,6 @@ networks:
   iot_network:
     driver: bridge
 
-# Persist data so you don't lose flows/dashboards when restarting
 volumes:
-  node_red_data:
   influxdb_data:
   grafana_data:

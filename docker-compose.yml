@@ -8,6 +8,7 @@ services:
       - "9001:9001" # Websocket port
     volumes:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mosquitto/passwd:/mosquitto/config/passwd  # <--- AGGIUNGI QUESTO
     networks:
       - iot_network
 
@@ -65,7 +66,9 @@ services:
     build: ./sensors # Builds using the Dockerfile in the current directory
     container_name: sensor_simulator
     environment:
-      - MQTT_BROKER=mosquitto  # Tells the script to connect to the service named 'mosquitto'
+      - MQTT_BROKER=mosquitto
+      - MQTT_USER=iot_user          # <--- AGGIUNGI QUESTO
+      - MQTT_PASSWORD=iot_password  # <--- AGGIUNGI QUESTO  # Tells the script to connect to the service named 'mosquitto'
     networks:
       - iot_network
     depends_on:

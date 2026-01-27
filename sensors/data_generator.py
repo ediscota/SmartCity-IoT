@@ -14,6 +14,11 @@ broker_env = os.getenv('MQTT_BROKER')
 client_address = broker_env if broker_env else config['mqtt']['client_address']
 port = int(config['mqtt']['port'])
 
+# --- NEW: Read Credentials from Environment Variables ---
+mqtt_user = os.getenv('MQTT_USER')
+mqtt_password = os.getenv('MQTT_PASSWORD')
+# --------------------------------------------------------
+
 sensor_list = config['data_generation']['sensors'].split('|')
 
 # Distretto -> lista strade
@@ -22,8 +27,11 @@ city_map = {}
 
 for d in district_names:
     section = f"district_{d}"
-    streets = config[section]['streets'].split('|')
-    city_map[d] = streets
+    if section in config:
+        streets = config[section]['streets'].split('|')
+        city_map[d] = streets
+    else:
+        print(f"Warning: Section [{section}] not found in config.ini")
 
 # Global variable for dynamic config (shared by all threads)
 global_settings = {
@@ -32,11 +40,18 @@ global_settings = {
 
 mqtt_client = mqtt.Client()
 
+# --- NEW: Configure Authentication if credentials exist ---
+if mqtt_user and mqtt_password:
+    mqtt_client.username_pw_set(mqtt_user, mqtt_password)
+    print(f"Auth configured for user: {mqtt_user}")
+# ----------------------------------------------------------
+
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print(f"Connected to Broker at {client_address}")
         client.subscribe("smartcity/config")
     else:
+        # rc 5 means Connection Refused: not authorized
         print(f"Failed to connect, return code {rc}")
 
 # Handles dynamic configuration from MQTT Explorer. Expected payload: {"time_sleep": 1}

@@ -14,13 +14,20 @@ broker_env = os.getenv('MQTT_BROKER')
 client_address = broker_env if broker_env else config['mqtt']['client_address']
 port = int(config['mqtt']['port'])
 
-districts = int(config['data_generation']['districts'])
-streets = int(config['data_generation']['streets'])
 sensor_list = config['data_generation']['sensors'].split('|')
+
+# Distretto -> lista strade
+district_names = config['data_generation']['districts'].split('|')
+city_map = {}
+
+for d in district_names:
+    section = f"district_{d}"
+    streets = config[section]['streets'].split('|')
+    city_map[d] = streets
 
 # Global variable for dynamic config (shared by all threads)
 global_settings = {
-    "time_sleep": int(config['data_generation']['time_sleep'])
+    "time_sleep": float(config['data_generation']['time_sleep'])
 }
 
 mqtt_client = mqtt.Client()
@@ -28,13 +35,11 @@ mqtt_client = mqtt.Client()
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print(f"Connected to Broker at {client_address}")
-        # Subscribe to a global config topic
-        # MQTT Explorer can publish to this topic to change behavior
         client.subscribe("smartcity/config")
     else:
         print(f"Failed to connect, return code {rc}")
 
-#Handles dynamic configuration from MQTT Explorer. Expected payload: {"time_sleep": 1}
+# Handles dynamic configuration from MQTT Explorer. Expected payload: {"time_sleep": 1}
 def on_message(client, userdata, msg):
     try:
         payload = json.loads(msg.payload.decode())
@@ -48,8 +53,6 @@ def on_message(client, userdata, msg):
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 mqtt_client.connect(client_address, port=port)
-
-# Start the network loop in a separate thread so it doesn't block simulation
 mqtt_client.loop_start()
 
 # --- Simulation Function ---
@@ -58,12 +61,10 @@ def publish_street_data(mqtt_client, sensor_list, district, street):
     Simulates one street with multiple sensors.
     """
     while True:
-        # Generate random sensor data
         for sensor in sensor_list:
             data = 0
             unit = ""
-            
-            # Smart City Data Logic
+
             if sensor == 'temperature':
                 data = round(random.uniform(15, 35), 2)
                 unit = "C"
@@ -92,32 +93,31 @@ def publish_street_data(mqtt_client, sensor_list, district, street):
                 data = round(random.uniform(10, 180), 2)
                 unit = "ppb"
 
-            
-            # Topic Structure: smartcity/district_0/street_1/temperature
-            topic = f"smartcity/district_{district}/street_{street}/{sensor}"
-            
-            # JSON Payload (Required by specs)
+            # Topic con nomi reali
+            topic = f"smartcity/{district}/{street}/{sensor}"
+
             payload = {
                 "value": data,
                 "unit": unit,
                 "timestamp": time.time()
             }
-            
+
             mqtt_client.publish(topic, json.dumps(payload))
             print(f"[{topic}] {data} {unit}")
 
-        # Dynamic Sleep: Reads from the global settings that on_message updates
-        time.sleep(global_settings["time_sleep"]) 
+        time.sleep(global_settings["time_sleep"])
 
 # --- Thread Management ---
 threads = []
-print(f"Starting simulation for {districts} districts and {streets} streets per district...")
+print("Starting simulation with custom city map:")
+for d, streets in city_map.items():
+    print(f"  {d}: {len(streets)} streets")
 
-for d in range(districts):
-    for s in range(streets):
+for district, streets in city_map.items():
+    for street in streets:
         thread = threading.Thread(
-            target=publish_street_data, 
-            args=(mqtt_client, sensor_list, d, s)
+            target=publish_street_data,
+            args=(mqtt_client, sensor_list, district, street)
         )
         threads.append(thread)
         thread.start()

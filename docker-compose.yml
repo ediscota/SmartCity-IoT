@@ -19,6 +19,10 @@ services:
     container_name: node_red
     ports:
       - "1880:1880"
+    environment:
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - TELEGRAM_CHATID=${TELEGRAM_CHATID}
+      - INFLUX_TOKEN=${INFLUX_TOKEN}
     volumes:
       - ./nodered/data:/data
     networks:

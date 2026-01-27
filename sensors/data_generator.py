@@ -5,6 +5,7 @@ import configparser
 import threading
 import json
 import os
+from collections import deque
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -40,6 +41,19 @@ global_settings = {
 
 mqtt_client = mqtt.Client()
 
+# --- NEW: Resilience structures ---
+offline_queue = deque()
+is_connected = False
+# ---------------------------------
+
+# --- NEW: Configure Authentication if credentials exist ---
+if mqtt_user and mqtt_password:
+    mqtt_client.username_pw_set(mqtt_user, mqtt_password)
+    print(f"Auth configured for user: {mqtt_user}")
+# ----------------------------------------------------------
+
+
+
 # --- NEW: Configure Authentication if credentials exist ---
 if mqtt_user and mqtt_password:
     mqtt_client.username_pw_set(mqtt_user, mqtt_password)
@@ -47,12 +61,27 @@ if mqtt_user and mqtt_password:
 # ----------------------------------------------------------
 
 def on_connect(client, userdata, flags, rc):
+    global is_connected
     if rc == 0:
+        is_connected = True
         print(f"Connected to Broker at {client_address}")
         client.subscribe("smartcity/config")
+
+        if offline_queue:
+            print(f"Flushing {len(offline_queue)} buffered messages...")
+            while offline_queue:
+                topic, payload = offline_queue.popleft()
+                client.publish(topic, json.dumps(payload))
     else:
-        # rc 5 means Connection Refused: not authorized
         print(f"Failed to connect, return code {rc}")
+
+
+
+def on_disconnect(client, userdata, rc):
+    global is_connected
+    is_connected = False
+    print("Disconnected from MQTT broker, buffering messages...")
+
 
 # Handles dynamic configuration from MQTT Explorer. Expected payload: {"time_sleep": 1}
 def on_message(client, userdata, msg):
@@ -65,10 +94,34 @@ def on_message(client, userdata, msg):
     except Exception as e:
         print(f"Error parsing config: {e}")
 
+def safe_publish(topic, payload):
+    """
+    Publishes if connected, otherwise buffers the message.
+    """
+    if is_connected:
+        mqtt_client.publish(topic, json.dumps(payload))
+    else:
+        offline_queue.append((topic, payload))
+        print(f"Buffered (offline): {topic}")
+
+def reconnect_and_flush():
+    while True:
+        if not is_connected:
+            try:
+                print("Trying to reconnect to MQTT broker...")
+                mqtt_client.reconnect()
+            except:
+                pass
+        time.sleep(5)
+
+
 mqtt_client.on_connect = on_connect
+mqtt_client.on_disconnect = on_disconnect
 mqtt_client.on_message = on_message
 mqtt_client.connect(client_address, port=port)
 mqtt_client.loop_start()
+
+threading.Thread(target=reconnect_and_flush, daemon=True).start()
 
 # --- Simulation Function ---
 def publish_street_data(mqtt_client, sensor_list, district, street):
@@ -117,10 +170,11 @@ def publish_street_data(mqtt_client, sensor_list, district, street):
                 "timestamp": time.time()
             }
 
-            mqtt_client.publish(topic, json.dumps(payload))
+            safe_publish(topic, payload)
             print(f"[{topic}] {data} {unit}")
 
         time.sleep(global_settings["time_sleep"])
+
 
 # --- Thread Management ---
 threads = []

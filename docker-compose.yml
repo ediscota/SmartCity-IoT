@@ -76,6 +76,22 @@ services:
     depends_on:
       - mosquitto
 
+  telegraf:
+    image: telegraf:1.30
+    container_name: smartcity_telegraf
+    depends_on:
+      - mosquitto
+      - influxdb
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    environment:
+      - INFLUX_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
+      - MQTT_USER=${MQTT_USER}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+    networks:
+      - iot_network
+
+
 # Create a shared network for all containers to talk to each other
 networks:
   iot_network:

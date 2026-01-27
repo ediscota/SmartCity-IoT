@@ -326,7 +326,7 @@
         "type": "function",
         "z": "f6f2187d.f17ca8",
         "name": "function: set threshold",
-        "func": "let defaults = {\n    temperature: 40,\n    noise: 90,\n    humidity: 80,\n    traffic: 90,\n    aqi: 120\n};\n\nlet stored = flow.get(\"thresholds\") || {};\nlet thresholds = { ...defaults, ...stored };\n\n// Determina il tipo di \"sensore\"\nlet sensor;\n\n// Caso 1: messaggi dai sensori grezzi (dopo parse topic)\nif (msg.sensor) {\n    sensor = msg.sensor;\n}\n// Caso 2: messaggi AQI (topic: smartcity/processed/.../aqi)\nelse if (msg.topic && msg.topic.endsWith(\"/aqi\")) {\n    sensor = \"aqi\";\n    msg.sensor = \"aqi\"; // normalizziamo il messaggio\n} else {\n    return null;\n}\n\n// Se non abbiamo una soglia per questo sensore, ignora\nif (!thresholds.hasOwnProperty(sensor)) {\n    return null;\n}\n\nmsg.threshold = thresholds[sensor];\nreturn msg;\n",
+        "func": "let defaults = {\n    temperature: 40,\n    noise: 90,\n    humidity: 80,\n    traffic: 90,\n    aqi: 200\n};\n\nlet stored = flow.get(\"thresholds\") || {};\nlet thresholds = { ...defaults, ...stored };\n\n// Determina il tipo di \"sensore\"\nlet sensor;\n\n// Caso 1: messaggi dai sensori grezzi (dopo parse topic)\nif (msg.sensor) {\n    sensor = msg.sensor;\n}\n// Caso 2: messaggi AQI (topic: smartcity/processed/.../aqi)\nelse if (msg.topic && msg.topic.endsWith(\"/aqi\")) {\n    sensor = \"aqi\";\n    msg.sensor = \"aqi\"; // normalizziamo il messaggio\n} else {\n    return null;\n}\n\n// Se non abbiamo una soglia per questo sensore, ignora\nif (!thresholds.hasOwnProperty(sensor)) {\n    return null;\n}\n\nmsg.threshold = thresholds[sensor];\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,

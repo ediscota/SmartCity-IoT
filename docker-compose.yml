@@ -24,6 +24,8 @@ services:
       - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
       - TELEGRAM_CHATID=${TELEGRAM_CHATID}
       - INFLUX_TOKEN=${INFLUX_TOKEN}
+      - MQTT_USER=${MQTT_USER}          # <--- AGGIUNGI QUESTO
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
     volumes:
       - ./nodered/data:/data
     networks:
@@ -39,10 +41,10 @@ services:
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=admin
-      - DOCKER_INFLUXDB_INIT_PASSWORD=admin12345
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${DOCKER_INFLUXDB_INIT_PASSWORD}
       - DOCKER_INFLUXDB_INIT_ORG=smartcity-org
       - DOCKER_INFLUXDB_INIT_BUCKET=smartcity-bucket
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
     volumes:
       - influxdb_data:/var/lib/influxdb2
     networks:
@@ -67,8 +69,8 @@ services:
     container_name: sensor_simulator
     environment:
       - MQTT_BROKER=mosquitto
-      - MQTT_USER=iot_user          # <--- AGGIUNGI QUESTO
-      - MQTT_PASSWORD=iot_password  # <--- AGGIUNGI QUESTO  # Tells the script to connect to the service named 'mosquitto'
+      - MQTT_USER=${MQTT_USER}          
+      - MQTT_PASSWORD=${MQTT_PASSWORD}  
     networks:
       - iot_network
     depends_on:

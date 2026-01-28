@@ -240,7 +240,7 @@
         "z": "f6f2187d.f17ca8",
         "influxdb": "44ec679abea81acc",
         "name": "",
-        "query": "from(bucket: \"smartcity-bucket\")\n  |> range(start: -10s)  // Ho aumentato a 1 minuto per sicurezza, puoi rimettere -10s\n  |> filter(fn: (r) => r[\"_measurement\"] == \"smartcity_sensors\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")",
+        "query": "from(bucket: \"smartcity-bucket\")\n  |> range(start: -10s) \n  |> filter(fn: (r) => r[\"_measurement\"] == \"smartcity_sensors\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")",
         "rawOutput": false,
         "precision": "",
         "retentionPolicy": "",

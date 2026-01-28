@@ -58,6 +58,13 @@ services:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
+      
+      # 1. Montiamo TUTTO il provisioning (datasources + dashboard config)
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      
+      # 2. Montiamo la cartella dei JSON nel percorso che abbiamo scritto nel dashboard.yaml
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+
     networks:
       - iot_network
     depends_on:

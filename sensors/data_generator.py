@@ -94,6 +94,7 @@ def on_message(client, userdata, msg):
     except Exception as e:
         print(f"Error parsing config: {e}")
 
+#Guarantees RESILIENCEby buffering messages when offline
 def safe_publish(topic, payload):
     """
     Publishes if connected, otherwise buffers the message.
@@ -104,6 +105,7 @@ def safe_publish(topic, payload):
         offline_queue.append((topic, payload))
         print(f"Buffered (offline): {topic}")
 
+#guarantees RESILIENCE by trying to reconnect every 5 seconds
 def reconnect_and_flush():
     while True:
         if not is_connected:

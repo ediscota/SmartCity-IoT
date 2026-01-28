@@ -152,26 +152,6 @@
         "x": 590,
         "y": 260,
         "wires": [
-            [
-                "a821851e0ee32862"
-            ]
-        ]
-    },
-    {
-        "id": "a821851e0ee32862",
-        "type": "function",
-        "z": "f6f2187d.f17ca8",
-        "name": "function: update threshold",
-        "func": "let current = flow.get(\"thresholds\") || {};\nObject.assign(current, msg.payload);\nflow.set(\"thresholds\", current);\n\nnode.warn(\"Thresholds updated: \" + JSON.stringify(current));\nreturn null;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 810,
-        "y": 260,
-        "wires": [
             []
         ]
     },
@@ -260,7 +240,7 @@
         "z": "f6f2187d.f17ca8",
         "influxdb": "44ec679abea81acc",
         "name": "",
-        "query": "from(bucket: \"smartcity-bucket\")\n  |> range(start: -10s)\n  |> filter(fn: (r) => r._measurement == \"mqtt_consumer\")\n  |> filter(fn: (r) => r._field == \"value\")\n",
+        "query": "from(bucket: \"smartcity-bucket\")\n  |> range(start: -10s)  // Ho aumentato a 1 minuto per sicurezza, puoi rimettere -10s\n  |> filter(fn: (r) => r[\"_measurement\"] == \"smartcity_sensors\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")",
         "rawOutput": false,
         "precision": "",
         "retentionPolicy": "",

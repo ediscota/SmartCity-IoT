@@ -121,46 +121,11 @@
         "wires": []
     },
     {
-        "id": "e4f6be6d5e3fb0d2",
-        "type": "mqtt in",
-        "z": "f6f2187d.f17ca8",
-        "name": "",
-        "topic": "smartcity/config",
-        "qos": "2",
-        "datatype": "auto-detect",
-        "broker": "590edad057ee053e",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 380,
-        "y": 260,
-        "wires": [
-            [
-                "4d6228ad4010de53"
-            ]
-        ]
-    },
-    {
-        "id": "4d6228ad4010de53",
-        "type": "json",
-        "z": "f6f2187d.f17ca8",
-        "name": "",
-        "property": "payload",
-        "action": "obj",
-        "pretty": false,
-        "x": 590,
-        "y": 260,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "fbc316b92781d453",
         "type": "function",
         "z": "f6f2187d.f17ca8",
         "name": "set threshold",
-        "func": "let defaults = {\n    temperature: 40,\n    noise: 90,\n    humidity: 80,\n    traffic: 90,\n    aqi: 200\n};\n\nlet stored = flow.get(\"thresholds\") || {};\nlet thresholds = { ...defaults, ...stored };\n\n// Determina il tipo di \"sensore\"\nlet sensor;\n\n// Caso 1: messaggi dai sensori grezzi (dopo parse topic)\nif (msg.sensor) {\n    sensor = msg.sensor;\n}\n// Caso 2: messaggi AQI (topic: smartcity/processed/.../aqi)\nelse if (msg.topic && msg.topic.endsWith(\"/aqi\")) {\n    sensor = \"aqi\";\n    msg.sensor = \"aqi\"; // normalizziamo il messaggio\n} else {\n    return null;\n}\n\n// Se non abbiamo una soglia per questo sensore, ignora\nif (!thresholds.hasOwnProperty(sensor)) {\n    return null;\n}\n\nmsg.threshold = thresholds[sensor];\nreturn msg;\n",
+        "func": "const thresholds = flow.get(\"thresholds\");\nif (!thresholds) {\n    // soglie non ancora caricate\n    return null;\n}\n\n// Determina il sensore\nlet sensor;\n\nif (msg.sensor) {\n    sensor = msg.sensor;\n} else if (msg.topic && msg.topic.endsWith(\"/aqi\")) {\n    sensor = \"aqi\";\n    msg.sensor = \"aqi\";\n} else {\n    return null;\n}\n\nif (!thresholds.hasOwnProperty(sensor)) {\n    return null;\n}\n\nmsg.threshold = thresholds[sensor];\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -317,6 +282,74 @@
         "libs": [],
         "x": 590,
         "y": 460,
+        "wires": [
+            [
+                "fbc316b92781d453"
+            ]
+        ]
+    },
+    {
+        "id": "e46199984a794dba",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 320,
+        "wires": [
+            [
+                "1296a05e8310cf5a"
+            ]
+        ]
+    },
+    {
+        "id": "1296a05e8310cf5a",
+        "type": "influxdb in",
+        "z": "f6f2187d.f17ca8",
+        "influxdb": "44ec679abea81acc",
+        "name": "",
+        "query": "from(bucket: \"smartcity-bucket\")\n  |> range(start: -10s)\n  |> filter(fn: (r) => r._measurement == \"smartcity_config\")\n  |> last()\n",
+        "rawOutput": false,
+        "precision": "",
+        "retentionPolicy": "",
+        "org": "smartcity-org",
+        "x": 340,
+        "y": 320,
+        "wires": [
+            [
+                "9918ab1b27beca65"
+            ]
+        ]
+    },
+    {
+        "id": "9918ab1b27beca65",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "store threshold",
+        "func": "if (!Array.isArray(msg.payload)) {\n    return null;\n}\n\nlet map = {};\n\nfor (let r of msg.payload) {\n    // r._field = temperature | noise | humidity | ...\n    // r._value = soglia\n    map[r._field] = r._value;\n}\n\nflow.set(\"thresholds\", map);\nnode.warn(\"Thresholds updated from DB: \" + JSON.stringify(map));\n\nreturn null;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 320,
         "wires": [
             [
                 "fbc316b92781d453"

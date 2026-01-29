@@ -1,0 +1,7 @@
+{
+  "temperature": 20,
+  "noise": 90,
+  "humidity": 80,
+  "traffic": 90,
+  "aqi": 200
+}

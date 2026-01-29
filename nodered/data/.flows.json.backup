@@ -121,109 +121,11 @@
         "wires": []
     },
     {
-        "id": "78e348b934ecca09",
+        "id": "fbc316b92781d453",
         "type": "function",
         "z": "f6f2187d.f17ca8",
-        "name": "function: parse topic",
-        "func": "const parts = msg.topic.split(\"/\");\n\nmsg.parts = parts;\nmsg.district = parts[1];\nmsg.street   = parts[2];\nmsg.sensor   = parts[3];\n\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 680,
-        "y": 420,
-        "wires": [
-            [
-                "3793eec90c2b478e",
-                "4b32dc2d835769b2"
-            ]
-        ]
-    },
-    {
-        "id": "3793eec90c2b478e",
-        "type": "function",
-        "z": "f6f2187d.f17ca8",
-        "name": "function: aggregate air",
-        "func": "// accetta solo sensori dell'aria\nconst airSensors = [\"pm25\", \"pm10\", \"co\", \"no2\", \"o3\"];\nif (!airSensors.includes(msg.sensor)) {\n    return null;\n}\n\n// chiave unica per ogni strada\nlet key = msg.district + \"/\" + msg.street;\n\n// recupero lo stato dal contesto\nlet store = flow.get(\"air\") || {};\n\n// inizializzo se non esiste\nstore[key] = store[key] || {};\n\n// salvo il valore del sensore corrente\nstore[key][msg.sensor] = msg.payload.value;\n\n// aggiorno il contesto\nflow.set(\"air\", store);\n\n// controllo se ho tutti i sensori necessari\nlet s = store[key];\nif (\n    s.hasOwnProperty(\"pm25\") &&\n    s.hasOwnProperty(\"pm10\") &&\n    s.hasOwnProperty(\"co\") &&\n    s.hasOwnProperty(\"no2\") &&\n    s.hasOwnProperty(\"o3\")\n) {\n    return {\n        topic: `smartcity/processed/${key}/air_raw`,\n        payload: {\n            pm25: s.pm25,\n            pm10: s.pm10,\n            co: s.co,\n            no2: s.no2,\n            o3: s.o3,\n            timestamp: Date.now()\n        }\n    };\n}\n\nreturn null;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 960,
-        "y": 420,
-        "wires": [
-            [
-                "c4971743de191ba7"
-            ]
-        ]
-    },
-    {
-        "id": "c4971743de191ba7",
-        "type": "function",
-        "z": "f6f2187d.f17ca8",
-        "name": "function: calculate AQI",
-        "func": "let p = msg.payload;\n\n// normalizzazione semplificata\nlet aqi_pm25 = p.pm25 * 2;\nlet aqi_pm10 = p.pm10;\nlet aqi_co   = p.co * 20;\nlet aqi_no2  = p.no2 / 2;\nlet aqi_o3   = p.o3 / 2;\n\nlet aqi = Math.round(Math.max(aqi_pm25, aqi_pm10, aqi_co, aqi_no2, aqi_o3));\n\nlet level =\n    aqi < 50  ? \"good\" :\n    aqi < 100 ? \"moderate\" :\n    aqi < 150 ? \"unhealthy\" : \"danger\";\n\n// ricava la chiave strada dal topic: smartcity/processed/<district>/<street>/air_raw\nlet parts = msg.topic.split(\"/\");\nlet key = parts[2] + \"/\" + parts[3];\n\n// recupera ultimo valore AQI per questa strada\nlet last = flow.get(\"lastAqi\") || {};\nlet lastValue = last[key];\n\n// se il valore è identico al precedente, non fare nulla\nif (lastValue === aqi) {\n    return null;\n}\n\n// aggiorna lo stato\nlast[key] = aqi;\nflow.set(\"lastAqi\", last);\n\nmsg.topic = msg.topic.replace(\"air_raw\", \"aqi\");\nmsg.payload = {\n    value: aqi,\n    level: level,\n    timestamp: Date.now()\n};\n\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1220,
-        "y": 420,
-        "wires": [
-            [
-                "4b32dc2d835769b2"
-            ]
-        ]
-    },
-    {
-        "id": "e4f6be6d5e3fb0d2",
-        "type": "mqtt in",
-        "z": "f6f2187d.f17ca8",
-        "name": "",
-        "topic": "smartcity/config",
-        "qos": "2",
-        "datatype": "auto-detect",
-        "broker": "590edad057ee053e",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 380,
-        "y": 260,
-        "wires": [
-            [
-                "4d6228ad4010de53"
-            ]
-        ]
-    },
-    {
-        "id": "4d6228ad4010de53",
-        "type": "json",
-        "z": "f6f2187d.f17ca8",
-        "name": "",
-        "property": "payload",
-        "action": "obj",
-        "pretty": false,
-        "x": 590,
-        "y": 260,
-        "wires": [
-            [
-                "a821851e0ee32862"
-            ]
-        ]
-    },
-    {
-        "id": "a821851e0ee32862",
-        "type": "function",
-        "z": "f6f2187d.f17ca8",
-        "name": "function: update threshold",
-        "func": "let current = flow.get(\"thresholds\") || {};\nObject.assign(current, msg.payload);\nflow.set(\"thresholds\", current);\n\nnode.warn(\"Thresholds updated: \" + JSON.stringify(current));\nreturn null;\n",
+        "name": "set threshold",
+        "func": "const thresholds = flow.get(\"thresholds\");\nif (!thresholds) {\n    // soglie non ancora caricate\n    return null;\n}\n\n// Determina il sensore\nlet sensor;\n\nif (msg.sensor) {\n    sensor = msg.sensor;\n} else if (msg.topic && msg.topic.endsWith(\"/aqi\")) {\n    sensor = \"aqi\";\n    msg.sensor = \"aqi\";\n} else {\n    return null;\n}\n\nif (!thresholds.hasOwnProperty(sensor)) {\n    return null;\n}\n\nmsg.threshold = thresholds[sensor];\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -231,46 +133,9 @@
         "finalize": "",
         "libs": [],
         "x": 810,
-        "y": 260,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "4b32dc2d835769b2",
-        "type": "function",
-        "z": "f6f2187d.f17ca8",
-        "name": "function: prepare influx",
-        "func": "let district, street, sensor, value, timestamp;\n\n// Caso 1: sensori grezzi (dopo parse topic)\nif (msg.sensor && msg.district && msg.street) {\n    district = msg.district;\n    street   = msg.street;\n    sensor   = msg.sensor;\n    value    = parseFloat(msg.payload.value);\n\n    if (msg.payload.timestamp) {\n        // sensori Python: timestamp in secondi\n        timestamp = new Date(msg.payload.timestamp * 1000);\n    } else {\n        timestamp = new Date();\n    }\n}\n// Caso 2: AQI (topic: smartcity/processed/<district>/<street>/aqi)\nelse if (msg.topic && msg.topic.endsWith(\"/aqi\")) {\n    let parts = msg.topic.split(\"/\");\n    district = parts[2];\n    street   = parts[3];\n    sensor   = \"aqi\";\n\n    value = parseFloat(msg.payload.value);\n\n    if (msg.payload.timestamp) {\n        // AQI usa già millisecondi\n        timestamp = new Date(msg.payload.timestamp);\n    } else {\n        timestamp = new Date();\n    }\n} else {\n    // messaggio non gestibile\n    return null;\n}\n\n// ---- VALIDAZIONE ----\nif (isNaN(value)) {\n    node.warn(\"Scarto punto: value non numerico\");\n    return null;\n}\n\nif (!(timestamp instanceof Date)) {\n    node.warn(\"Scarto punto: timestamp non valido\");\n    return null;\n}\n\n// FORMAT per InfluxDB: [fields, tags]\nlet fields = {\n    value: value\n};\n\nlet tags = {\n    district: district,\n    street: street,\n    sensor: sensor\n};\n\nmsg.measurement = \"smartcity_sensors\";\nmsg.payload = [fields, tags];\nmsg.timestamp = timestamp;\n\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1260,
-        "y": 300,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "fbc316b92781d453",
-        "type": "function",
-        "z": "f6f2187d.f17ca8",
-        "name": "function: set threshold",
-        "func": "let defaults = {\n    temperature: 40,\n    noise: 90,\n    humidity: 80,\n    traffic: 90,\n    aqi: 200\n};\n\nlet stored = flow.get(\"thresholds\") || {};\nlet thresholds = { ...defaults, ...stored };\n\n// Determina il tipo di \"sensore\"\nlet sensor;\n\n// Caso 1: messaggi dai sensori grezzi (dopo parse topic)\nif (msg.sensor) {\n    sensor = msg.sensor;\n}\n// Caso 2: messaggi AQI (topic: smartcity/processed/.../aqi)\nelse if (msg.topic && msg.topic.endsWith(\"/aqi\")) {\n    sensor = \"aqi\";\n    msg.sensor = \"aqi\"; // normalizziamo il messaggio\n} else {\n    return null;\n}\n\n// Se non abbiamo una soglia per questo sensore, ignora\nif (!thresholds.hasOwnProperty(sensor)) {\n    return null;\n}\n\nmsg.threshold = thresholds[sensor];\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1120,
-        "y": 580,
+        "y": 420,
         "wires": [
             [
-                "4aa5d2da19a77399",
                 "0fa24286d761db1d"
             ]
         ]
@@ -292,8 +157,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1450,
-        "y": 540,
+        "x": 970,
+        "y": 420,
         "wires": [
             [
                 "283d4716071d7df0"
@@ -304,7 +169,7 @@
         "id": "283d4716071d7df0",
         "type": "function",
         "z": "f6f2187d.f17ca8",
-        "name": "function: format alert",
+        "name": "format alert",
         "func": "let value = msg.payload.value;\n\n// Ricava location in modo robusto\nlet district = msg.district;\nlet street = msg.street;\n\n// Se arriva dall'AQI, district/street non esistono: estrai dal topic\nif (!district || !street) {\n    let parts = msg.topic.split(\"/\");\n    // smartcity/processed/district_1/street_0/aqi\n    district = parts[2];\n    street = parts[3];\n}\n\nlet location = `${district}/${street}`;\n\nmsg.payload = {\n    chatId: Number(env.get(\"TELEGRAM_CHATID\")),\n    type: \"message\",\n    content:\n`🚨 ALERT\n\nDomain: Smart City IoT\nSensor: ${msg.sensor}\nLocation: ${location}\nCondition: Exceeds ${msg.sensor} threshold: ${value} > ${msg.threshold}`\n};\n\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
@@ -312,8 +177,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1640,
-        "y": 540,
+        "x": 1130,
+        "y": 420,
         "wires": [
             [
                 "3da4d8c9ec5488ff"
@@ -328,8 +193,8 @@
         "bot": "7053e9055bd0b798",
         "haserroroutput": false,
         "outputs": 1,
-        "x": 1870,
-        "y": 540,
+        "x": 1330,
+        "y": 420,
         "wires": [
             []
         ]
@@ -340,12 +205,12 @@
         "z": "f6f2187d.f17ca8",
         "influxdb": "44ec679abea81acc",
         "name": "",
-        "query": "from(bucket: \"smartcity-bucket\")\n  |> range(start: -10s)\n  |> filter(fn: (r) => r._measurement == \"mqtt_consumer\")\n  |> filter(fn: (r) => r._field == \"value\")\n",
+        "query": "from(bucket: \"smartcity-bucket\")\n  |> range(start: -10s) \n  |> filter(fn: (r) => r[\"_measurement\"] == \"smartcity_sensors\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")",
         "rawOutput": false,
         "precision": "",
         "retentionPolicy": "",
         "org": "smartcity-org",
-        "x": 320,
+        "x": 340,
         "y": 420,
         "wires": [
             [
@@ -353,23 +218,6 @@
                 "310ff938d2b18fa6"
             ]
         ]
-    },
-    {
-        "id": "4aa5d2da19a77399",
-        "type": "debug",
-        "z": "f6f2187d.f17ca8",
-        "name": "debug 1",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1300,
-        "y": 640,
-        "wires": []
     },
     {
         "id": "602c98e76d93e24f",
@@ -392,7 +240,7 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 130,
+        "x": 150,
         "y": 420,
         "wires": [
             [
@@ -404,7 +252,7 @@
         "id": "319ca1e7c0608239",
         "type": "function",
         "z": "f6f2187d.f17ca8",
-        "name": "function: calculate aqi",
+        "name": "calculate aqi",
         "func": "if (!Array.isArray(msg.payload) || msg.payload.length === 0) {\n    return null;\n}\n\n// struttura: { \"district/street\": { co, pm25, pm10, no2, o3 } }\nlet map = {};\n\n// costruisce la mappa dai record Influx\nfor (let r of msg.payload) {\n    const key = r.district + \"/\" + r.street;\n\n    if (!map[key]) map[key] = {};\n\n    map[key][r.sensor] = r._value;\n}\n\n// per ogni strada che ha tutti i sensori aria, calcola AQI\nlet out = [];\n\nfor (let key in map) {\n    let s = map[key];\n\n    if (\n        s.pm25 !== undefined &&\n        s.pm10 !== undefined &&\n        s.co   !== undefined &&\n        s.no2  !== undefined &&\n        s.o3   !== undefined\n    ) {\n        let aqi_pm25 = s.pm25 * 2;\n        let aqi_pm10 = s.pm10;\n        let aqi_co   = s.co * 20;\n        let aqi_no2  = s.no2 / 2;\n        let aqi_o3   = s.o3 / 2;\n\n        let aqi = Math.round(Math.max(\n            aqi_pm25, aqi_pm10, aqi_co, aqi_no2, aqi_o3\n        ));\n\n        let level =\n            aqi < 50  ? \"good\" :\n            aqi < 100 ? \"moderate\" :\n            aqi < 150 ? \"unhealthy\" : \"danger\";\n\n        let [district, street] = key.split(\"/\");\n\n        out.push({\n            district,\n            street,\n            sensor: \"aqi\",\n            payload: {\n                value: aqi,\n                level,\n                timestamp: Date.now()\n            }\n        });\n    }\n}\n\nreturn [out];\n",
         "outputs": 1,
         "timeout": 0,
@@ -412,8 +260,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 740,
-        "y": 520,
+        "x": 590,
+        "y": 380,
         "wires": [
             [
                 "fbc316b92781d453"
@@ -424,7 +272,7 @@
         "id": "310ff938d2b18fa6",
         "type": "function",
         "z": "f6f2187d.f17ca8",
-        "name": "function: extract env sensor",
+        "name": "extract env sensor",
         "func": "if (!Array.isArray(msg.payload) || msg.payload.length === 0) {\n    return null;\n}\n\nconst allowed = [\"temperature\", \"noise\", \"traffic\", \"humidity\"];\nlet out = [];\n\nfor (let r of msg.payload) {\n    if (!allowed.includes(r.sensor)) continue;\n\n    out.push({\n        district: r.district,\n        street: r.street,\n        sensor: r.sensor,\n        payload: {\n            value: r._value,\n            timestamp: new Date(r._time).getTime()\n        }\n    });\n}\n\nreturn [out];\n",
         "outputs": 1,
         "timeout": 0,
@@ -432,8 +280,76 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 700,
-        "y": 560,
+        "x": 590,
+        "y": 460,
+        "wires": [
+            [
+                "fbc316b92781d453"
+            ]
+        ]
+    },
+    {
+        "id": "e46199984a794dba",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 320,
+        "wires": [
+            [
+                "1296a05e8310cf5a"
+            ]
+        ]
+    },
+    {
+        "id": "1296a05e8310cf5a",
+        "type": "influxdb in",
+        "z": "f6f2187d.f17ca8",
+        "influxdb": "44ec679abea81acc",
+        "name": "",
+        "query": "from(bucket: \"smartcity-bucket\")\n  |> range(start: -10s)\n  |> filter(fn: (r) => r._measurement == \"smartcity_config\")\n  |> last()\n",
+        "rawOutput": false,
+        "precision": "",
+        "retentionPolicy": "",
+        "org": "smartcity-org",
+        "x": 340,
+        "y": 320,
+        "wires": [
+            [
+                "9918ab1b27beca65"
+            ]
+        ]
+    },
+    {
+        "id": "9918ab1b27beca65",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "store threshold",
+        "func": "if (!Array.isArray(msg.payload)) {\n    return null;\n}\n\nlet map = {};\n\nfor (let r of msg.payload) {\n    // r._field = temperature | noise | humidity | ...\n    // r._value = soglia\n    map[r._field] = r._value;\n}\n\nflow.set(\"thresholds\", map);\nnode.warn(\"Thresholds updated from DB: \" + JSON.stringify(map));\n\nreturn null;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 320,
         "wires": [
             [
                 "fbc316b92781d453"

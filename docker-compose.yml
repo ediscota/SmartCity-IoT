@@ -24,7 +24,7 @@ services:
       - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
       - TELEGRAM_CHATID=${TELEGRAM_CHATID}
       - INFLUX_TOKEN=${INFLUX_TOKEN}
-      - MQTT_USER=${MQTT_USER}          # <--- AGGIUNGI QUESTO
+      - MQTT_USER=${MQTT_USER}
       - MQTT_PASSWORD=${MQTT_PASSWORD}
     volumes:
       - ./nodered/data:/data
@@ -56,6 +56,8 @@ services:
     container_name: smartcity_grafana
     ports:
       - "3000:3000"
+    environment:
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
     volumes:
       - grafana_data:/var/lib/grafana
       
@@ -91,12 +93,15 @@ services:
       - influxdb
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./config/thresholds.json:/etc/telegraf/thresholds.json:ro   # <--- nuovo
     environment:
       - INFLUX_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
       - MQTT_USER=${MQTT_USER}
       - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - THRESHOLDS_PATH=/etc/telegraf/thresholds.json   # <--- nuovo
     networks:
       - iot_network
+
 
 
 # Create a shared network for all containers to talk to each other

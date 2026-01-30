@@ -4,11 +4,11 @@ services:
     image: eclipse-mosquitto
     container_name: mqtt_broker
     ports:
-      - "1883:1883" # MQTT port
+      - "1883:1883" 
       - "9001:9001" # Websocket port
     volumes:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - ./mosquitto/passwd:/mosquitto/config/passwd  # <--- AGGIUNGI QUESTO
+      - ./mosquitto/passwd:/mosquitto/config/passwd  
     networks:
       - iot_network
 
@@ -32,7 +32,6 @@ services:
       - iot_network
 
   # 3. Time-Series Database (InfluxDB)
-  # Using v1.8 here for easier integration with Grafana/Node-RED for students
   influxdb:
     image: influxdb:2.7
     container_name: smartcity_influxdb
@@ -60,21 +59,16 @@ services:
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
     volumes:
       - grafana_data:/var/lib/grafana
-      
-      # 1. Montiamo TUTTO il provisioning (datasources + dashboard config)
       - ./grafana/provisioning:/etc/grafana/provisioning
-      
-      # 2. Montiamo la cartella dei JSON nel percorso che abbiamo scritto nel dashboard.yaml
       - ./grafana/dashboards:/var/lib/grafana/dashboards
-
     networks:
       - iot_network
     depends_on:
       - influxdb
 
-  # 5. Your Python Data Generator
+  # 5. Python Data Generator
   sensor-simulator:
-    build: ./sensors # Builds using the Dockerfile in the current directory
+    build: ./sensors 
     container_name: sensor_simulator
     environment:
       - MQTT_BROKER=mosquitto
@@ -85,6 +79,7 @@ services:
     depends_on:
       - mosquitto
 
+  # 6. Telegraf
   telegraf:
     image: telegraf:1.30
     container_name: smartcity_telegraf

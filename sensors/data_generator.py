@@ -7,7 +7,7 @@ import json
 import os
 from collections import deque
 
-# ---------------- CONFIG ----------------
+# Config
 config = configparser.ConfigParser()
 config.read('config.ini')
 
@@ -21,6 +21,7 @@ mqtt_password = os.getenv('MQTT_PASSWORD')
 sensor_list = config['data_generation']['sensors'].split('|')
 district_names = config['data_generation']['districts'].split('|')
 
+# Build city map from configuration: district -> list of streets
 city_map = {}
 for d in district_names:
     section = f"district_{d}"
@@ -31,7 +32,7 @@ global_settings = {
     "time_sleep": float(config['data_generation']['time_sleep'])
 }
 
-# ---------------- MQTT + RESILIENCE ----------------
+# MQTT 
 mqtt_client = mqtt.Client()
 offline_queue = deque()
 is_connected = False
@@ -47,6 +48,7 @@ def on_connect(client, userdata, flags, rc):
         is_connected = True
         client.subscribe("smartcity/config")
 
+        # Flush buffered messages after successful reconnection (resilience)
         with lock:
             while offline_queue:
                 topic, payload = offline_queue.popleft()
@@ -94,7 +96,7 @@ def reconnect_loop():
 
 threading.Thread(target=reconnect_loop, daemon=True).start()
 
-# ---------------- SENSOR LOGIC ----------------
+# Sensor Logic
 def generate_value(sensor):
     section = f"sensor_{sensor}"
     if section not in config:
@@ -120,7 +122,7 @@ def publish_street_data(district, street):
 
         time.sleep(global_settings["time_sleep"])
 
-# ---------------- THREADS ----------------
+# Create and start a simulation thread for each street in the city map
 for district, streets in city_map.items():
     for street in streets:
         threading.Thread(
@@ -129,7 +131,7 @@ for district, streets in city_map.items():
             daemon=True
         ).start()
 
-# ---------------- KEEP ALIVE ----------------
+# Keep main thread alive while simulation threads are running
 try:
     while True:
         time.sleep(1)

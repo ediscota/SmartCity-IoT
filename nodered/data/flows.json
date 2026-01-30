@@ -340,7 +340,7 @@
         "id": "9918ab1b27beca65",
         "type": "function",
         "z": "f6f2187d.f17ca8",
-        "name": "store threshold",
+        "name": "get threshold",
         "func": "if (!Array.isArray(msg.payload)) {\n    return null;\n}\n\nlet map = {};\n\nfor (let r of msg.payload) {\n    // r._field = temperature | noise | humidity | ...\n    // r._value = soglia\n    map[r._field] = r._value;\n}\n\nflow.set(\"thresholds\", map);\nnode.warn(\"Thresholds updated from DB: \" + JSON.stringify(map));\n\nreturn null;\n",
         "outputs": 1,
         "timeout": 0,
@@ -348,7 +348,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 580,
+        "x": 570,
         "y": 320,
         "wires": [
             [

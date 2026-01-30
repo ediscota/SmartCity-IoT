@@ -18,2013 +18,2341 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 2,
   "links": [],
   "panels": [
     {
-      "collapsed": false,
+      "collapsed": true,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
         "y": 0
       },
-      "id": 24,
-      "panels": [],
-      "title": "Traffic",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "value"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Threshold"
-              },
-              {
-                "id": "custom.lineStyle",
-                "value": {
-                  "dash": [
-                    10,
-                    10
-                  ],
-                  "fill": "dash"
-                }
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              },
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 14,
-        "w": 12,
-        "x": 0,
-        "y": 1
-      },
-      "id": 2,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"traffic\" and\r\n    r._field == \"value\"\r\n  )\r\n",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"traffic\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Traffic ",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "max": 120,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "blue",
-                "value": 0
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 12,
-        "y": 1
-      },
-      "id": 9,
-      "options": {
-        "minVizHeight": 75,
-        "minVizWidth": 75,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": true,
-        "showThresholdMarkers": true,
-        "sizing": "auto"
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"traffic\"\r\n  )\r\n  |> last()\r\n",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"traffic\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Current Traffic",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "value"
-            },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "_value"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 18,
-        "y": 1
-      },
-      "id": 10,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"traffic\"\r\n  )\r\n  |> mean()",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"traffic\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Mean Traffic",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "_value"
-            },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "blue",
-                "value": 0
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 12,
-        "y": 8
-      },
-      "id": 11,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"traffic\"\r\n  )\r\n  |> min()",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"traffic\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Min Traffic",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "value"
-            },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "blue",
-                "value": 0
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 18,
-        "y": 8
-      },
-      "id": 12,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"traffic\"\r\n  )\r\n  |> max()",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"traffic\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Max Traffic",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "value"
-            },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "stat"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 15
-      },
-      "id": 23,
-      "panels": [],
-      "title": "Noise",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "dB"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "value"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "purple",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Threshold"
-              },
-              {
-                "id": "custom.lineStyle",
-                "value": {
-                  "dash": [
-                    10,
-                    10
-                  ],
-                  "fill": "dash"
-                }
-              },
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 14,
-        "w": 12,
-        "x": 0,
-        "y": 16
-      },
-      "id": 3,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"noise\" and\r\n    r._field == \"value\"\r\n  )\r\n",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"noise\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Noise ",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "max": 119,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "purple",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "dB"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 12,
-        "y": 16
-      },
-      "id": 13,
-      "options": {
-        "minVizHeight": 75,
-        "minVizWidth": 75,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": true,
-        "showThresholdMarkers": true,
-        "sizing": "auto"
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"noise\"\r\n  )\r\n  |> last()\r\n",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"noise\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Current Noise ",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "value"
-            },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "purple",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "dB"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 18,
-        "y": 16
-      },
-      "id": 15,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"noise\"\r\n  )\r\n  |> mean()",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"noise\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Mean Noise",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "_value"
-            },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "purple",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "dB"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 12,
-        "y": 23
-      },
-      "id": 14,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"noise\"\r\n  )\r\n  |> min()",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"noise\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Min Noise",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "value"
-            },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "purple",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "dB"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 18,
-        "y": 23
-      },
-      "id": 18,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"noise\"\r\n  )\r\n  |> max()",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"noise\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Max Noise",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "value"
-            },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "stat"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 30
-      },
       "id": 22,
-      "panels": [],
+      "panels": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "line"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Value"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Threshold"
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "dark-red",
+                      "mode": "fixed"
+                    }
+                  },
+                  {
+                    "id": "custom.lineStyle",
+                    "value": {
+                      "dash": [
+                        10,
+                        10
+                      ],
+                      "fill": "dash"
+                    }
+                  },
+                  {
+                    "id": "custom.showPoints",
+                    "value": "never"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 14,
+            "w": 12,
+            "x": 0,
+            "y": 1
+          },
+          "id": 1,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"temperature\" and\r\n    r._field == \"value\"\r\n  )\r\n",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"temperature\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Temperature ",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "max": 50,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "dark-red",
+                    "value": ""
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 12,
+            "y": 1
+          },
+          "id": 5,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": true,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"temperature\"\r\n  )\r\n  |> last()\r\n",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"temperature\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Current Temperature",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "min": -1,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 18,
+            "y": 1
+          },
+          "id": 6,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"temperature\"\r\n  )\r\n  |> mean()",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"temperature\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Mean Temperature",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "_value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 12,
+            "y": 164
+          },
+          "id": 8,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"temperature\"\r\n  )\r\n  |> min()",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"temperature\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Min Temperature",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 18,
+            "y": 164
+          },
+          "id": 7,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"temperature\"\r\n  )\r\n  |> max()",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"temperature\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Max Temperature",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "stat"
+        }
+      ],
       "title": "Temperature",
       "type": "row"
     },
     {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "line"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "celsius"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Threshold"
-              },
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-red",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.lineStyle",
-                "value": {
-                  "dash": [
-                    10,
-                    10
-                  ],
-                  "fill": "dash"
-                }
-              },
-              {
-                "id": "custom.showPoints",
-                "value": "never"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 14,
-        "w": 12,
-        "x": 0,
-        "y": 31
-      },
-      "id": 1,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"temperature\" and\r\n    r._field == \"value\"\r\n  )\r\n",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"temperature\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Temperature ",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "max": 50,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "dark-red",
-                "value": ""
-              }
-            ]
-          },
-          "unit": "celsius"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 12,
-        "y": 31
-      },
-      "id": 5,
-      "options": {
-        "minVizHeight": 75,
-        "minVizWidth": 75,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": true,
-        "showThresholdMarkers": true,
-        "sizing": "auto"
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"temperature\"\r\n  )\r\n  |> last()\r\n",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"temperature\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Current Temperature",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "value"
-            },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "min": -1,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "celsius"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 18,
-        "y": 31
-      },
-      "id": 6,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"temperature\"\r\n  )\r\n  |> mean()",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"temperature\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Mean Temperature",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "_value"
-            },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "celsius"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 12,
-        "y": 38
-      },
-      "id": 8,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"temperature\"\r\n  )\r\n  |> min()",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"temperature\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Min Temperature",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "value"
-            },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "celsius"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 18,
-        "y": 38
-      },
-      "id": 7,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"temperature\"\r\n  )\r\n  |> max()",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"temperature\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Max Temperature",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "value"
-            },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "stat"
-    },
-    {
-      "collapsed": false,
+      "collapsed": true,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 45
+        "y": 1
+      },
+      "id": 23,
+      "panels": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "dB"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "purple",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Value"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Threshold"
+                  },
+                  {
+                    "id": "custom.lineStyle",
+                    "value": {
+                      "dash": [
+                        10,
+                        10
+                      ],
+                      "fill": "dash"
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  },
+                  {
+                    "id": "custom.showPoints",
+                    "value": "never"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 14,
+            "w": 12,
+            "x": 0,
+            "y": 2
+          },
+          "id": 3,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"noise\" and\r\n    r._field == \"value\"\r\n  )\r\n",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"noise\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Noise ",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "max": 119,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "purple",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "dB"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 12,
+            "y": 2
+          },
+          "id": 13,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": true,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"noise\"\r\n  )\r\n  |> last()\r\n",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"noise\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Current Noise ",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "purple",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "dB"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 18,
+            "y": 2
+          },
+          "id": 15,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"noise\"\r\n  )\r\n  |> mean()",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"noise\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Mean Noise",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "_value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "purple",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "dB"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 12,
+            "y": 95
+          },
+          "id": 14,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"noise\"\r\n  )\r\n  |> min()",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"noise\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Min Noise",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "purple",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "dB"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 18,
+            "y": 95
+          },
+          "id": 18,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"noise\"\r\n  )\r\n  |> max()",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"noise\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Max Noise",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "stat"
+        }
+      ],
+      "title": "Noise",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 2
       },
       "id": 21,
-      "panels": [],
+      "panels": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Value"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Threshold"
+                  },
+                  {
+                    "id": "custom.lineStyle",
+                    "value": {
+                      "dash": [
+                        10,
+                        10
+                      ],
+                      "fill": "dash"
+                    }
+                  },
+                  {
+                    "id": "custom.showPoints",
+                    "value": "never"
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "yellow",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 14,
+            "w": 12,
+            "x": 0,
+            "y": 145
+          },
+          "id": 4,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"humidity\" and\r\n    r._field == \"value\"\r\n  )\r\n",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"humidity\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Humidity",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "max": 120,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "yellow",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 12,
+            "y": 145
+          },
+          "id": 19,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": true,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"humidity\"\r\n  )\r\n  |> last()\r\n",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"humidity\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Currrent Humidity",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "yellow",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 18,
+            "y": 145
+          },
+          "id": 16,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"humidity\"\r\n  )\r\n  |> mean()",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"humidity\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Mean Humidity",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "_value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "yellow",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 12,
+            "y": 152
+          },
+          "id": 17,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"humidity\"\r\n  )\r\n  |> min()",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"humidity\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Min Humidity",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "yellow",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 18,
+            "y": 152
+          },
+          "id": 20,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"humidity\"\r\n  )\r\n  |> max()",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"humidity\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Max Humidity",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "stat"
+        }
+      ],
       "title": "Humidity",
       "type": "row"
     },
     {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 3
       },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
+      "id": 24,
+      "panels": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
           },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "none"
             },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Value"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Threshold"
+                  },
+                  {
+                    "id": "custom.lineStyle",
+                    "value": {
+                      "dash": [
+                        10,
+                        10
+                      ],
+                      "fill": "dash"
+                    }
+                  },
+                  {
+                    "id": "custom.showPoints",
+                    "value": "never"
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 14,
+            "w": 12,
+            "x": 0,
+            "y": 4
+          },
+          "id": 2,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
             },
-            "showPoints": "auto",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
             }
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "humidity"
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"traffic\" and\r\n    r._field == \"value\"\r\n  )\r\n",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"traffic\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Traffic ",
+          "type": "timeseries"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value"
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "max": 120,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": 0
+                  }
+                ]
+              }
             },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Threshold"
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 12,
+            "y": 4
+          },
+          "id": 9,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": true,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"traffic\"\r\n  )\r\n  |> last()\r\n",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
               },
-              {
-                "id": "custom.lineStyle",
-                "value": {
-                  "dash": [
-                    10,
-                    10
-                  ],
-                  "fill": "dash"
-                }
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"traffic\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Current Traffic",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
               },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  }
+                ]
+              }
+            },
+            "overrides": [
               {
-                "id": "custom.showPoints",
-                "value": "never"
-              },
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
+                "matcher": {
+                  "id": "byName",
+                  "options": "_value"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
               }
             ]
           },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "value"
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 18,
+            "y": 4
+          },
+          "id": 10,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
             },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "yellow",
-                  "mode": "fixed"
-                }
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"traffic\"\r\n  )\r\n  |> mean()",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"traffic\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Mean Traffic",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "_value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
               }
-            ]
-          }
-        ]
-      },
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": 0
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 12,
+            "y": 27
+          },
+          "id": 11,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"traffic\"\r\n  )\r\n  |> min()",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"traffic\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Min Traffic",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": 0
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 18,
+            "y": 27
+          },
+          "id": 12,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"traffic\"\r\n  )\r\n  |> max()",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "hide": false,
+              "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"traffic\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
+              "refId": "B"
+            }
+          ],
+          "title": "Max Traffic",
+          "transformations": [
+            {
+              "id": "configFromData",
+              "options": {
+                "applyTo": {
+                  "id": "byName",
+                  "options": "value"
+                },
+                "configRefId": "B",
+                "mappings": [
+                  {
+                    "fieldName": "Value",
+                    "handlerKey": "threshold1"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "stat"
+        }
+      ],
+      "title": "Traffic",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
       "gridPos": {
-        "h": 14,
-        "w": 12,
+        "h": 1,
+        "w": 24,
         "x": 0,
-        "y": 46
+        "y": 4
       },
-      "id": 4,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"humidity\" and\r\n    r._field == \"value\"\r\n  )\r\n",
-          "refId": "A"
-        },
+      "id": 30,
+      "panels": [
         {
           "datasource": {
             "type": "influxdb",
             "uid": "P6C6E45D2C675362D"
           },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"humidity\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Humidity",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "max": 120,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "yellow",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "humidity"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 12,
-        "y": 46
-      },
-      "id": 19,
-      "options": {
-        "minVizHeight": 75,
-        "minVizWidth": 75,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": true,
-        "showThresholdMarkers": true,
-        "sizing": "auto"
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"humidity\"\r\n  )\r\n  |> last()\r\n",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P6C6E45D2C675362D"
-          },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"humidity\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Currrent Humidity",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "value"
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "conμgm3"
             },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
+            "overrides": []
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "yellow",
-                "value": 0
-              }
-            ]
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 5
           },
-          "unit": "humidity"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 18,
-        "y": 46
-      },
-      "id": 16,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
+          "id": 29,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"o3\"\r\n  )\r\n  |> mean()",
+              "refId": "A"
+            }
           ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"humidity\"\r\n  )\r\n  |> mean()",
-          "refId": "A"
+          "title": "O₃",
+          "type": "stat"
         },
         {
           "datasource": {
             "type": "influxdb",
             "uid": "P6C6E45D2C675362D"
           },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"humidity\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Mean Humidity",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "_value"
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "conμgm3"
             },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
+            "overrides": []
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "yellow",
-                "value": 0
-              }
-            ]
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 5
           },
-          "unit": "humidity"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 12,
-        "y": 53
-      },
-      "id": 17,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
+          "id": 28,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"no2\"\r\n  )\r\n  |> mean()",
+              "refId": "A"
+            }
           ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"humidity\"\r\n  )\r\n  |> min()",
-          "refId": "A"
+          "title": "NO₂",
+          "type": "stat"
         },
         {
           "datasource": {
             "type": "influxdb",
             "uid": "P6C6E45D2C675362D"
           },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"humidity\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Min Humidity",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "value"
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "conμgm3"
             },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P6C6E45D2C675362D"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
+            "overrides": []
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "yellow",
-                "value": 0
-              }
-            ]
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 5
           },
-          "unit": "humidity"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 18,
-        "y": 53
-      },
-      "id": 20,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
+          "id": 27,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"pm10\"\r\n  )\r\n  |> mean()",
+              "refId": "A"
+            }
           ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"humidity\"\r\n  )\r\n  |> max()",
-          "refId": "A"
+          "title": "PM10",
+          "type": "stat"
         },
         {
           "datasource": {
             "type": "influxdb",
             "uid": "P6C6E45D2C675362D"
           },
-          "hide": false,
-          "query": "threshold =\r\n  from(bucket: \"smartcity-bucket\")\r\n    |> range(start: -30d)\r\n    |> filter(fn: (r) =>\r\n      r._measurement == \"smartcity_config\" and\r\n      r._field == \"humidity\"\r\n    )\r\n    |> last()\r\n\r\nstart =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStart,\r\n        _value: r._value\r\n    }))\r\n\r\nstop =\r\n  threshold\r\n    |> map(fn: (r) => ({\r\n        _time: v.timeRangeStop,\r\n        _value: r._value\r\n    }))\r\n\r\nunion(tables: [start, stop])\r\n",
-          "refId": "B"
-        }
-      ],
-      "title": "Max Humidity",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "value"
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "conμgm3"
             },
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "Value",
-                "handlerKey": "threshold1"
-              }
-            ]
-          }
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 4,
+            "y": 13
+          },
+          "id": 26,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"pm25\"\r\n  )\r\n  |> mean()",
+              "refId": "A"
+            }
+          ],
+          "title": "PM2.5",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P6C6E45D2C675362D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "conμgm3"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 12,
+            "y": 13
+          },
+          "id": 25,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "P6C6E45D2C675362D"
+              },
+              "query": "from(bucket: \"smartcity-bucket\")\r\n  |> range(start: v.timeRangeStart)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"smartcity_sensors\" and\r\n    r.district == \"${district}\" and\r\n    r.street == \"${street}\" and\r\n    r.sensor == \"co\"\r\n  )\r\n  |> mean()",
+              "refId": "A"
+            }
+          ],
+          "title": "CO",
+          "type": "stat"
         }
       ],
-      "type": "stat"
+      "title": "Air Parameters",
+      "type": "row"
     }
   ],
   "preload": false,
@@ -2080,5 +2408,5 @@
   "timezone": "browser",
   "title": "smart-city",
   "uid": "adpcpdg",
-  "version": 5
+  "version": 2
 }

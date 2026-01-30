@@ -14,15 +14,11 @@ config.read('config.ini')
 broker_env = os.getenv('MQTT_BROKER')
 client_address = broker_env if broker_env else config['mqtt']['client_address']
 port = int(config['mqtt']['port'])
-
-# --- NEW: Read Credentials from Environment Variables ---
 mqtt_user = os.getenv('MQTT_USER')
 mqtt_password = os.getenv('MQTT_PASSWORD')
-# --------------------------------------------------------
-
 sensor_list = config['data_generation']['sensors'].split('|')
 
-# Distretto -> lista strade
+# Districts -> streets mapping
 district_names = config['data_generation']['districts'].split('|')
 city_map = {}
 
@@ -40,25 +36,18 @@ global_settings = {
 }
 
 mqtt_client = mqtt.Client()
-
-# --- NEW: Resilience structures ---
+#Resilience structures 
 offline_queue = deque()
 is_connected = False
-# ---------------------------------
 
-# --- NEW: Configure Authentication if credentials exist ---
+#Configure Authentication if credentials exist
 if mqtt_user and mqtt_password:
     mqtt_client.username_pw_set(mqtt_user, mqtt_password)
     print(f"Auth configured for user: {mqtt_user}")
-# ----------------------------------------------------------
 
-
-
-# --- NEW: Configure Authentication if credentials exist ---
 if mqtt_user and mqtt_password:
     mqtt_client.username_pw_set(mqtt_user, mqtt_password)
     print(f"Auth configured for user: {mqtt_user}")
-# ----------------------------------------------------------
 
 def on_connect(client, userdata, flags, rc):
     global is_connected
@@ -75,15 +64,12 @@ def on_connect(client, userdata, flags, rc):
     else:
         print(f"Failed to connect, return code {rc}")
 
-
-
 def on_disconnect(client, userdata, rc):
     global is_connected
     is_connected = False
     print("Disconnected from MQTT broker, buffering messages...")
 
-
-# Handles dynamic configuration from MQTT Explorer. Expected payload: {"time_sleep": 1}
+#Handles dynamic configuration from MQTT Explorer. Expected payload: {"time_sleep": 1}
 def on_message(client, userdata, msg):
     try:
         payload = json.loads(msg.payload.decode())
@@ -94,7 +80,7 @@ def on_message(client, userdata, msg):
     except Exception as e:
         print(f"Error parsing config: {e}")
 
-#Guarantees RESILIENCEby buffering messages when offline
+#Guarantees RESILIENCE by buffering messages when offline
 def safe_publish(topic, payload):
     """
     Publishes if connected, otherwise buffers the message.
@@ -105,7 +91,7 @@ def safe_publish(topic, payload):
         offline_queue.append((topic, payload))
         print(f"Buffered (offline): {topic}")
 
-#guarantees RESILIENCE by trying to reconnect every 5 seconds
+#Guarantees RESILIENCE by trying to reconnect every 5 seconds
 def reconnect_and_flush():
     while True:
         if not is_connected:
@@ -116,16 +102,14 @@ def reconnect_and_flush():
                 pass
         time.sleep(5)
 
-
 mqtt_client.on_connect = on_connect
 mqtt_client.on_disconnect = on_disconnect
 mqtt_client.on_message = on_message
 mqtt_client.connect(client_address, port=port)
 mqtt_client.loop_start()
-
 threading.Thread(target=reconnect_and_flush, daemon=True).start()
 
-# --- Simulation Function ---
+#Simulation Function
 def publish_street_data(mqtt_client, sensor_list, district, street):
     """
     Simulates one street with multiple sensors.
@@ -163,7 +147,7 @@ def publish_street_data(mqtt_client, sensor_list, district, street):
                 data = round(random.uniform(10, 180), 2)
                 unit = "ppb"
 
-            # Topic con nomi reali
+            #Topic with structure: smartcity/district/street/sensor
             topic = f"smartcity/{district}/{street}/{sensor}"
 
             payload = {
@@ -178,7 +162,7 @@ def publish_street_data(mqtt_client, sensor_list, district, street):
         time.sleep(global_settings["time_sleep"])
 
 
-# --- Thread Management ---
+#Thread Management
 threads = []
 print("Starting simulation with custom city map:")
 for d, streets in city_map.items():
@@ -193,7 +177,7 @@ for district, streets in city_map.items():
         threads.append(thread)
         thread.start()
 
-# Keep main script alive
+#Keep main script alive
 try:
     for thread in threads:
         thread.join()

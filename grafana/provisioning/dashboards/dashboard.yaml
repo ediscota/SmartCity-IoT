@@ -8,5 +8,4 @@ providers:
     disableDeletion: false
     updateIntervalSeconds: 10
     options:
-      # IMPORTANTE: Questo è il percorso DENTRO il container, non sul tuo PC
       path: /var/lib/grafana/dashboards

@@ -39,6 +39,7 @@ All components are deployed as Docker containers and orchestrated using Docker C
 ```bash
 git clone <repository-url>
 cd <repository-root>
+```
 
 ### 2. Create the .env file
 
@@ -52,7 +53,7 @@ MQTT_USER=iot_user
 MQTT_PASSWORD=iot_password
 DOCKER_INFLUXDB_INIT_PASSWORD=admin12345
 DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
-
+```
 
 ### 3. Start thhe system
 
@@ -60,5 +61,5 @@ From the root directory of the project, run:
 
 ```bash
 docker compose up --build
-
+```
 Docker Compose will build and start all services required for the Smart City monitoring system.

@@ -55,7 +55,7 @@ DOCKER_INFLUXDB_INIT_PASSWORD=admin12345
 DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
 ```
 
-### 3. Start thhe system
+### 3. Start the system
 
 From the root directory of the project, run:
 
